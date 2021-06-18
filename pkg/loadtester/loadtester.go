@@ -3,6 +3,7 @@ package loadtester
 import (
 	"encoding/binary"
 	"fmt"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -57,6 +58,9 @@ func (t *LoadTester) Start() error {
 	t.room = room
 	t.running.Store(true)
 	room.Callback.OnTrackSubscribed = t.onTrackSubscribed
+	room.Callback.OnTrackSubscriptionFailed = func(sid string, rp *lksdk.RemoteParticipant) {
+		fmt.Println("track subscription failed", sid)
+	}
 
 	return nil
 }
@@ -72,23 +76,24 @@ func (t *LoadTester) PublishTrack(name string, kind lksdk.TrackKind, bitrate uin
 	if !t.IsRunning() {
 		return "", nil
 	}
-	sampleProvider, err := lksdk.NewLoadTestProvider(bitrate)
-	if err != nil {
-		return "", err
-	}
 
+	var sampleProvider lksdk.SampleProvider
 	var codecCapability webrtc.RTPCodecCapability
 	if kind == lksdk.TrackKindVideo {
-		codecCapability = webrtc.RTPCodecCapability{
-			MimeType:    webrtc.MimeTypeVP8,
-			ClockRate:   33,
-			SDPFmtpLine: "",
-			RTCPFeedback: []webrtc.RTCPFeedback{
-				{Type: webrtc.TypeRTCPFBNACK},
-				{Type: webrtc.TypeRTCPFBNACK, Parameter: "pli"},
-			},
+		f, err := os.Open("samples/sample.264")
+		if err != nil {
+			return "", err
+		}
+		sampleProvider, codecCapability, err = lksdk.NewFileSampleProvider(f, "video/VP8")
+		if err != nil {
+			return "", err
 		}
 	} else {
+		var err error
+		sampleProvider, err = lksdk.NewLoadTestProvider(bitrate)
+		if err != nil {
+			return "", err
+		}
 		codecCapability = webrtc.RTPCodecCapability{
 			MimeType:    webrtc.MimeTypeOpus,
 			ClockRate:   20,

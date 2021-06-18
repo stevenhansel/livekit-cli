@@ -17,4 +17,4 @@ require (
 	golang.org/x/sys v0.0.0-20210601080250-7ecdf8ef093b // indirect
 )
 
-// replace github.com/livekit/livekit-sdk-go => ../livekit-sdk-go
+ replace github.com/livekit/livekit-sdk-go => ../livekit-sdk-go
