@@ -183,11 +183,13 @@ func (t *LoadTester) consumeTrack(track *webrtc.TrackRemote) {
 		value, _ := t.stats.Load(track.ID())
 		ts := value.(*trackStats)
 
-		sentAt := int64(binary.LittleEndian.Uint64(payload[len(payload)-8:]))
-		latency := time.Now().UnixNano() - sentAt
-		if latency > 0 && latency < 1000000000 {
-			ts.latency += time.Now().UnixNano() - sentAt
-			ts.latencyCount++
+		if len(payload) >= 8 {
+			sentAt := int64(binary.LittleEndian.Uint64(payload[len(payload)-8:]))
+			latency := time.Now().UnixNano() - sentAt
+			if latency > 0 && latency < 1000000000 {
+				ts.latency += time.Now().UnixNano() - sentAt
+				ts.latencyCount++
+			}
 		}
 
 		if ts.max%65535 > 48000 && pkt.SequenceNumber < 16000 {

@@ -99,6 +99,13 @@ Sample `request` json file:
 
 ## livekit-load-tester
 
+When running the load tester, ensure your file descriptor limit is set high enough to allow the parallelization. Check with: `ulimit -n`
+
+To set it
+```
+sudo ulimit -n 10000
+```
+
 ```shell
 % ./bin/livekit-load-tester --help
 NAME:
