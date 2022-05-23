@@ -3,8 +3,7 @@ name: Release
 # on events
 on:
   push:
-    tags:
-      - v*
+    branches: [ main ]
 
 # workflow tasks
 jobs:
@@ -14,6 +13,12 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
+        with:
+          lfs: 'true'
+
+      - name: Pull Git LFS Files
+        uses: actions/checkout@v2
+        run: git lfs pull
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
