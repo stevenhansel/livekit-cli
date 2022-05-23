@@ -18,7 +18,8 @@ jobs:
 
       - name: Pull Git LFS Files
         uses: actions/checkout@v2
-        run: git lfs pull
+
+      - run: git lfs pull
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
