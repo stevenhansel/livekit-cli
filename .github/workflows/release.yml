@@ -3,7 +3,8 @@ name: Release
 # on events
 on:
   push:
-    branches: [ main ]
+    tags:
+      - v*
 
 # workflow tasks
 jobs:
